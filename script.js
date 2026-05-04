@@ -232,10 +232,53 @@ function updateChart() {
             enabled: false
         },
         exporting: {
-            enabled: window.innerWidth > 768, // Disable export menu on mobile
+            enabled: true,
             buttons: {
                 contextButton: {
-                    enabled: window.innerWidth > 768 // Disable fullscreen button on mobile
+                    enabled: true
+                }
+            },
+            menuItemDefinitions: {
+                viewFullscreen: {
+                    textKey: 'viewFullscreen',
+                    onclick: function() {
+                        // Custom fullscreen handling for mobile
+                        const chartContainer = this.container;
+                        if (window.innerWidth <= 768) {
+                            // On mobile, toggle maximized view instead of true fullscreen
+                            if (chartContainer.style.position === 'fixed') {
+                                // Exit maximized view
+                                chartContainer.style.position = '';
+                                chartContainer.style.top = '';
+                                chartContainer.style.left = '';
+                                chartContainer.style.width = '';
+                                chartContainer.style.height = '';
+                                chartContainer.style.zIndex = '';
+                                chartContainer.style.background = '';
+                                document.body.style.overflow = '';
+                            } else {
+                                // Enter maximized view
+                                chartContainer.style.position = 'fixed';
+                                chartContainer.style.top = '0';
+                                chartContainer.style.left = '0';
+                                chartContainer.style.width = '100vw';
+                                chartContainer.style.height = '100vh';
+                                chartContainer.style.zIndex = '9999';
+                                chartContainer.style.background = 'white';
+                                document.body.style.overflow = 'hidden';
+                            }
+                            this.reflow();
+                        } else {
+                            // Desktop: use native fullscreen
+                            if (chartContainer.requestFullscreen) {
+                                if (document.fullscreenElement) {
+                                    document.exitFullscreen();
+                                } else {
+                                    chartContainer.requestFullscreen();
+                                }
+                            }
+                        }
+                    }
                 }
             }
         },
