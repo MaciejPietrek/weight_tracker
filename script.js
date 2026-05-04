@@ -272,7 +272,7 @@ function updateChart() {
 
                 chart.setSize(
                   isFull ? rect.width : parentElement.clientWidth - 20,
-                  isFull ? rect.height : 300,
+                  isFull ? rect.height : 368,
                   false, // IMPORTANT: no animation lag
                 );
 
