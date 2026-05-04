@@ -385,3 +385,12 @@ textarea:focus {
         padding: 6px 8px;
     }
 }
+
+.chart-fullscreen {
+  position: fixed !important;
+  inset: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9999;
+  background: white;
+}

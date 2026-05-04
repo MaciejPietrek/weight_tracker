@@ -254,52 +254,45 @@ function updateChart() {
         viewFullscreen: {
           textKey: "viewFullscreen",
           onclick: function () {
-            // Custom fullscreen handling for mobile
-            /**
-             * @type {HTMLDivElement}
-             */
-            const chartContainer = this.container;
-            if (false) {
-              // On mobile, toggle maximized view instead of true fullscreen
-              if (chartContainer.style.position === "fixed") {
-                // Exit maximized view
-                chartContainer.style.position = "";
-                chartContainer.style.top = "";
-                chartContainer.style.left = "";
-                chartContainer.style.minWidth = "";
-                chartContainer.style.minHeight = "";
-                chartContainer.style.zIndex = "";
-                chartContainer.style.background = "";
-                document.body.style.overflow = "";
-                const svg = chartContainer.querySelector("svg");
-                svg.style.minWidth = "unset";
-                svg.style.minHeight = "unset";
-                console.log("removed", chartContainer);
-              } else {
-                // Enter maximized view
-                chartContainer.style.position = "fixed";
-                chartContainer.style.top = "0";
-                chartContainer.style.left = "0";
-                chartContainer.style.minWidth = "100vw";
-                chartContainer.style.minHeight = "100vh";
-                chartContainer.style.zIndex = "9999";
-                chartContainer.style.background = "white";
-                document.body.style.overflow = "hidden";
-                const svg = chartContainer.querySelector("svg");
-                //   svg.style.minWidth = "100%";
-                //   svg.style.minHeight = "100%";
-                console.log("added", chartContainer);
-              }
-              this.reflow();
+            const chart = this;
+            const container = chart.container;
+			/**@type {HTMLDivElement} */
+            const parentElement = container.parentElement;
+
+            const isMobile = window.innerWidth <= 768;
+
+            const toggle = () => {
+              const isFull = container.classList.toggle("chart-fullscreen");
+
+              document.body.style.overflow = isFull ? "hidden" : "";
+
+			  console.log(container, parentElement.clientWidth)
+              setTimeout(() => {
+                const rect = container.getBoundingClientRect();
+
+                chart.setSize(
+                  isFull ? rect.width : parentElement.clientWidth - 20,
+                  isFull ? rect.height : 300,
+                  false, // IMPORTANT: no animation lag
+                );
+
+                chart.reflow();
+              }, 150);
+            };
+
+            if (isMobile) {
+              toggle();
             } else {
-              // Desktop: use native fullscreen
-              if (chartContainer.requestFullscreen) {
-                if (document.fullscreenElement) {
-                  document.exitFullscreen();
-                } else {
-                  chartContainer.requestFullscreen();
-                }
+              if (!document.fullscreenElement) {
+                container.requestFullscreen?.();
+              } else {
+                document.exitFullscreen?.();
               }
+
+              setTimeout(() => {
+                chart.reflow();
+                chart.setSize();
+              }, 150);
             }
           },
         },
