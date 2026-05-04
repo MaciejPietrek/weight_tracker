@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weight Tracker</title>
+
+    <!-- PWA Meta Tags for iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Weight Tracker">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#667eea">
+
+    <!-- iOS Icons -->
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- External Libraries -->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>⚖️ Weight Tracker</h1>
+
+        <!-- Form Section -->
+        <div class="form-group">
+            <label for="datetime">Date & Time</label>
+            <input
+                type="datetime-local"
+                id="datetime"
+                required
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="weight">Weight (kg)</label>
+            <input
+                type="number"
+                id="weight"
+                step="0.01"
+                min="0"
+                placeholder="0.00"
+                required
+            >
+        </div>
+
+        <div class="button-group">
+            <button class="btn-primary" onclick="addEntry()">Add Entry</button>
+            <button class="btn-secondary" onclick="clearForm()">Clear</button>
+        </div>
+
+        <!-- Chart Section -->
+        <h2>📊 Weight Progress</h2>
+        <div id="chartContainer"></div>
+
+        <!-- Data List Section -->
+        <h2>📝 Recent Entries</h2>
+        <div class="data-list" id="dataList"></div>
+
+        <!-- Export/Import Section -->
+        <div class="export-import">
+            <div class="export-section">
+                <div class="section-title">📤 Export Data</div>
+                <div class="export-buttons">
+                    <button class="btn-secondary" onclick="copyToClipboard()">Copy to Clipboard</button>
+                    <button class="btn-secondary" onclick="downloadFile()">Save to File</button>
+                </div>
+            </div>
+
+            <div class="import-section">
+                <div class="section-title">📥 Import Data</div>
+                <textarea
+                    id="importData"
+                    placeholder="Paste JSON data here..."
+                ></textarea>
+                <div class="import-buttons">
+                    <button class="btn-secondary" onclick="importData()">Import</button>
+                    <button class="btn-secondary" onclick="clearImport()">Clear</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New version available
+                                    if (confirm('New version available! Reload to update?')) {
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

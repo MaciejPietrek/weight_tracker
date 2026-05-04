@@ -1,0 +1,278 @@
+const STORAGE_KEY = 'weightTrackerData';
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', () => {
+    setDefaultDateTime();
+    loadData();
+    updateChart();
+    updateDataList();
+});
+
+// Set current date and time as default
+function setDefaultDateTime() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+
+    document.getElementById('datetime').value = `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+// Get data from local storage
+function loadData() {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+}
+
+// Save data to local storage
+function saveData(data) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+// Add new entry
+function addEntry() {
+    const datetimeInput = document.getElementById('datetime').value;
+    const weightInput = document.getElementById('weight').value;
+
+    if (!datetimeInput || !weightInput) {
+        showNotification('Please fill in all fields', true);
+        return;
+    }
+
+    const entry = {
+        datetime: datetimeInput,
+        weight: parseFloat(weightInput),
+        id: Date.now()
+    };
+
+    const data = loadData();
+    data.push(entry);
+    data.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+    saveData(data);
+
+    clearForm();
+    updateChart();
+    updateDataList();
+    showNotification('Entry added successfully!');
+}
+
+// Delete entry
+function deleteEntry(id) {
+    let data = loadData();
+    data = data.filter(entry => entry.id !== id);
+    saveData(data);
+    updateChart();
+    updateDataList();
+    showNotification('Entry deleted!');
+}
+
+// Clear form
+function clearForm() {
+    document.getElementById('weight').value = '';
+    setDefaultDateTime();
+    document.getElementById('weight').focus();
+}
+
+// Update chart
+function updateChart() {
+    const data = loadData();
+
+    if (data.length === 0) {
+        document.getElementById('chartContainer').innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">No data to display</div>';
+        return;
+    }
+
+    const chartData = data.map(entry => {
+        const date = new Date(entry.datetime);
+        return [date.getTime(), entry.weight];
+    });
+
+    Highcharts.chart('chartContainer', {
+        chart: {
+            type: 'line',
+            backgroundColor: 'transparent',
+            borderRadius: 6
+        },
+        title: {
+            text: null
+        },
+        xAxis: {
+            type: 'datetime',
+            dateTimeLabelFormats: {
+                month: '%e. %b',
+                year: '%b'
+            }
+        },
+        yAxis: {
+            title: {
+                text: 'Weight (kg)'
+            }
+        },
+        series: [{
+            name: 'Weight',
+            data: chartData,
+            color: '#667eea',
+            fillOpacity: 0.1,
+            marker: {
+                radius: 5,
+                fillColor: '#667eea'
+            },
+            lineWidth: 2
+        }],
+        plotOptions: {
+            area: {
+                stacking: 'normal'
+            }
+        },
+        credits: {
+            enabled: false
+        },
+        responsive: {
+            rules: [{
+                condition: {
+                    maxWidth: 500
+                },
+                chartOptions: {
+                    chart: {
+                        height: 300
+                    }
+                }
+            }]
+        }
+    });
+}
+
+// Update data list
+function updateDataList() {
+    const data = loadData();
+    const dataList = document.getElementById('dataList');
+
+    if (data.length === 0) {
+        dataList.innerHTML = '<div class="data-list-empty">No entries yet. Add one to get started!</div>';
+        return;
+    }
+
+    dataList.innerHTML = data
+        .sort((a, b) => new Date(b.datetime) - new Date(a.datetime))
+        .map(entry => {
+            const date = new Date(entry.datetime);
+            const formattedDate = date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            return `
+                <div class="data-item">
+                    <div class="data-item-info">
+                        <div class="data-item-date">${formattedDate}</div>
+                        <div class="data-item-weight">${entry.weight.toFixed(2)} kg</div>
+                    </div>
+                    <button class="btn-danger" onclick="deleteEntry(${entry.id})">Delete</button>
+                </div>
+            `;
+        })
+        .join('');
+}
+
+// Copy to clipboard
+function copyToClipboard() {
+    const data = loadData();
+    const jsonString = JSON.stringify(data, null, 2);
+
+    navigator.clipboard.writeText(jsonString).then(() => {
+        showNotification('Copied to clipboard!');
+    }).catch(() => {
+        showNotification('Failed to copy to clipboard', true);
+    });
+}
+
+// Download file
+function downloadFile() {
+    const data = loadData();
+    const jsonString = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `weight-tracker-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showNotification('File downloaded!');
+}
+
+// Import data
+function importData() {
+    const importText = document.getElementById('importData').value.trim();
+
+    if (!importText) {
+        showNotification('Please paste JSON data', true);
+        return;
+    }
+
+    try {
+        const importedData = JSON.parse(importText);
+
+        if (!Array.isArray(importedData)) {
+            throw new Error('Data must be an array');
+        }
+
+        // Validate data structure
+        importedData.forEach(entry => {
+            if (!entry.datetime || typeof entry.weight !== 'number') {
+                throw new Error('Invalid data structure');
+            }
+        });
+
+        // Ask for confirmation if data exists
+        const existingData = loadData();
+        if (existingData.length > 0) {
+            if (!confirm('This will replace your existing data. Continue?')) {
+                return;
+            }
+        }
+
+        // Ensure all entries have unique IDs
+        importedData.forEach(entry => {
+            if (!entry.id) {
+                entry.id = Date.now() + Math.random();
+            }
+        });
+
+        saveData(importedData);
+        document.getElementById('importData').value = '';
+        updateChart();
+        updateDataList();
+        showNotification('Data imported successfully!');
+    } catch (error) {
+        showNotification('Invalid JSON format: ' + error.message, true);
+    }
+}
+
+// Clear import textarea
+function clearImport() {
+    document.getElementById('importData').value = '';
+}
+
+// Show notification
+function showNotification(message, isError = false) {
+    const notification = document.createElement('div');
+    notification.className = `notification ${isError ? 'error' : ''}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+// Allow Enter key to add entry
+document.getElementById('weight')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        addEntry();
+    }
+});
