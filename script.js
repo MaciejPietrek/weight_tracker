@@ -255,63 +255,34 @@ function updateChart() {
           textKey: "viewFullscreen",
           onclick: function () {
             const chart = this;
-            const container = chart.container;
-			/**@type {HTMLDivElement} */
-            const parentElement = container.parentElement;
+            /**@type {HTMLDivElement} */
+            const renderTarget = document.getElementById("chartContainer");
+            /**@type {HTMLDivElement} */
+            const fullscreenContainer = document.getElementById(
+              "fullscreenContainer",
+            );
+            /**@type {HTMLDivElement} */
+            const inlineContainer = document.getElementById("inlineContainer");
 
-            const isMobile = window.innerWidth <= 768;
-
-            const toggle = () => {
-              const isFull = container.classList.toggle("chart-fullscreen");
-
-              document.body.style.overflow = isFull ? "hidden" : "";
-
-			  console.log(container, parentElement.clientWidth)
-              setTimeout(() => {
-                const rect = container.getBoundingClientRect();
-
-                chart.setSize(
-                  isFull ? rect.width : parentElement.clientWidth - 20,
-                  isFull ? rect.height : 368,
-                  false, // IMPORTANT: no animation lag
-                );
-
-                chart.reflow();
-              });
-            };
-
-            if (isMobile) {
-              toggle();
+            if (fullscreenContainer.contains(renderTarget)) {
+              // Move back to inline container
+              inlineContainer.appendChild(renderTarget);
             } else {
-              if (!document.fullscreenElement) {
-                container.requestFullscreen?.();
-              } else {
-                document.exitFullscreen?.();
-              }
-
-              setTimeout(() => {
-                chart.reflow();
-                chart.setSize();
-              }, 150);
+              // Move to fullscreen container
+              fullscreenContainer.appendChild(renderTarget);
             }
+
+            // if (renderTarget.requestFullscreen) {
+            //   if (!document.fullscreenElement) {
+            //     renderTarget.requestFullscreen?.();
+            //   } else {
+            //     document.exitFullscreen?.();
+            //   }
+            // }
           },
         },
       },
-    },
-    responsive: {
-      rules: [
-        {
-          condition: {
-            maxWidth: 500,
-          },
-          chartOptions: {
-            chart: {
-              height: 300,
-            },
-          },
-        },
-      ],
-    },
+    }
   });
 }
 

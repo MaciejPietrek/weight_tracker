@@ -149,12 +149,29 @@ button {
     background: #ff5252;
 }
 
-#chartContainer {
+#inlineContainer {
     margin-top: 32px;
     min-height: 400px;
     background: #f9f9f9;
     border-radius: 6px;
     padding: 16px;
+}
+
+#fullscreenContainer {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+#fullscreenContainer:has(#chartContainer) {
+    pointer-events: all;
+    background-color: white;
+}
+
+#fullscreenContainer #chartContainer {
+    width: 100%;
+    height: 100%;
 }
 
 .data-list {
