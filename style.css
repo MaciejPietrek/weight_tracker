@@ -197,6 +197,12 @@ button {
     color: #333;
 }
 
+.data-item-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
 .export-import {
     margin-top: 32px;
     padding: 20px;
@@ -298,11 +304,17 @@ textarea:focus {
 
 @media (max-width: 480px) {
     body {
-        padding: 12px;
+        padding: 0;
+        background: white;
     }
 
     .container {
         padding: 16px;
+        background: transparent;
+        box-shadow: none;
+        border-radius: 0;
+        margin: 0;
+        max-width: none;
     }
 
     h1 {
@@ -349,5 +361,15 @@ textarea:focus {
         right: 12px;
         left: 12px;
         max-width: none;
+    }
+
+    .data-item-actions {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .data-item-actions button {
+        font-size: 12px;
+        padding: 6px 8px;
     }
 }

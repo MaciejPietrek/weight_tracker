@@ -1,4 +1,5 @@
 const STORAGE_KEY = 'weightTrackerData';
+let editingEntryId = null; // Track which entry is being edited
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
@@ -40,21 +41,38 @@ function addEntry() {
         return;
     }
 
-    const entry = {
-        datetime: datetimeInput,
-        weight: parseFloat(weightInput),
-        id: Date.now()
-    };
-
     const data = loadData();
-    data.push(entry);
+
+    if (editingEntryId) {
+        // Update existing entry
+        const entryIndex = data.findIndex(entry => entry.id === editingEntryId);
+        if (entryIndex !== -1) {
+            data[entryIndex] = {
+                ...data[entryIndex],
+                datetime: datetimeInput,
+                weight: parseFloat(weightInput)
+            };
+            showNotification('Entry updated successfully!');
+        }
+        editingEntryId = null; // Reset editing state
+        updateButtonText();
+    } else {
+        // Add new entry
+        const entry = {
+            datetime: datetimeInput,
+            weight: parseFloat(weightInput),
+            id: Date.now()
+        };
+        data.push(entry);
+        showNotification('Entry added successfully!');
+    }
+
     data.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
     saveData(data);
 
     clearForm();
     updateChart();
     updateDataList();
-    showNotification('Entry added successfully!');
 }
 
 // Delete entry
@@ -67,11 +85,52 @@ function deleteEntry(id) {
     showNotification('Entry deleted!');
 }
 
+// Edit entry
+function editEntry(id) {
+    const data = loadData();
+    const entry = data.find(entry => entry.id === id);
+
+    if (entry) {
+        // Set editing state
+        editingEntryId = id;
+
+        // Fill form with entry data
+        document.getElementById('datetime').value = entry.datetime;
+        document.getElementById('weight').value = entry.weight;
+
+        // Update button text
+        updateButtonText();
+
+        // Focus on weight field
+        document.getElementById('weight').focus();
+
+        // Scroll to form
+        document.querySelector('.form-group').scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+
+        showNotification('Entry loaded for editing. Update and click "Update Entry" to save changes.');
+    }
+}
+
 // Clear form
 function clearForm() {
     document.getElementById('weight').value = '';
     setDefaultDateTime();
     document.getElementById('weight').focus();
+    editingEntryId = null; // Reset editing state
+    updateButtonText();
+}
+
+// Update button text based on editing state
+function updateButtonText() {
+    const button = document.querySelector('.btn-primary');
+    if (editingEntryId) {
+        button.textContent = 'Update Entry';
+    } else {
+        button.textContent = 'Add Entry';
+    }
 }
 
 // Update chart
@@ -128,6 +187,14 @@ function updateChart() {
         credits: {
             enabled: false
         },
+        exporting: {
+            enabled: window.innerWidth > 768, // Disable export menu on mobile
+            buttons: {
+                contextButton: {
+                    enabled: window.innerWidth > 768 // Disable fullscreen button on mobile
+                }
+            }
+        },
         responsive: {
             rules: [{
                 condition: {
@@ -170,7 +237,10 @@ function updateDataList() {
                         <div class="data-item-date">${formattedDate}</div>
                         <div class="data-item-weight">${entry.weight.toFixed(2)} kg</div>
                     </div>
-                    <button class="btn-danger" onclick="deleteEntry(${entry.id})">Delete</button>
+                    <div class="data-item-actions">
+                        <button class="btn-secondary" onclick="editEntry(${entry.id})">Edit</button>
+                        <button class="btn-danger" onclick="deleteEntry(${entry.id})">Delete</button>
+                    </div>
                 </div>
             `;
         })

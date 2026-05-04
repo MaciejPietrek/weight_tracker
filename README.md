@@ -1,53 +1,163 @@
-# Weight Tracker PWA
+# ⚖️ Weight Tracker PWA
 
-A Progressive Web App for tracking weight with offline support, optimized for iOS Safari.
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-brightgreen)](https://maciejpietrek.github.io/weight_tracker/)
+[![PWA](https://img.shields.io/badge/PWA-Ready-blue)](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps)
+[![iOS](https://img.shields.io/badge/iOS-Supported-lightgrey)](https://developer.apple.com/documentation/webkit/delivering_web_content_to_safari)
+[![Offline](https://img.shields.io/badge/Offline-First-orange)](https://web.dev/learn/pwa/)
 
-## Features
+A modern, offline-first Progressive Web App for tracking weight progress with beautiful charts and iOS optimization.
 
-- 📱 **Mobile-first design** - Optimized for iPhone and iPad
-- 📊 **Interactive charts** - Visualize weight progress with Highcharts
-- 💾 **Offline support** - Works without internet after first load
-- 📤 **Data export/import** - JSON format for data backup
+## ✨ Features
+
+- 📱 **Mobile-First Design** - Optimized for iPhone and iPad with native app-like experience
+- 📊 **Interactive Charts** - Visualize weight progress with Highcharts library
+- 💾 **Offline Support** - Works completely offline after first load using Service Worker
+- 📤 **Data Export/Import** - Backup and restore data in JSON format
 - 🏠 **Add to Home Screen** - Installable as native iOS app
-- ⚡ **Fast loading** - Cached resources for instant startup
+- ⚡ **Fast Loading** - Cached resources for instant startup
+- 🎨 **Modern UI** - Clean, responsive design with smooth animations
+- 🔒 **Local Storage** - All data stored locally, privacy-focused
 
-## File Structure
+## 🚀 Live Demo
+
+[🌐 Try it now](https://maciejpietrek.github.io/weight_tracker/) - Works on any modern browser!
+
+## 📱 iOS Installation
+
+1. Open the app in Safari on your iPhone/iPad
+2. Wait for the page to fully load (Service Worker caches resources)
+3. Tap the Share button (⬜️ with arrow)
+4. Scroll down and tap "Add to Home Screen"
+5. Tap "Add" - the app icon will appear on your home screen!
+
+## 📁 Project Structure
 
 ```
 weight-tracker/
-├── index.html          # Main HTML file with PWA meta tags
-├── style.css           # All styles
-├── script.js           # Application logic
-├── manifest.json       # PWA manifest
-├── sw.js              # Service Worker for offline support
-├── icons/             # App icons
-│   ├── icon-192.png
-│   ├── icon-512.png
-│   └── icon.svg
-└── README.md          # This file
+├── index.html          # Main HTML with PWA meta tags & Service Worker registration
+├── style.css           # Modern, responsive styles with mobile optimizations
+├── script.js           # Application logic with local storage management
+├── manifest.json       # PWA manifest for app installation
+├── sw.js              # Service Worker for offline functionality
+├── icons/             # App icons for different sizes
+│   ├── icon-192.png   # Standard app icon
+│   ├── icon-512.png   # High-res app icon
+│   └── icon.svg       # Vector icon source
+└── README.md          # This documentation
 ```
 
-## How to Deploy to GitHub Pages
+## 🛠️ Technology Stack
 
-### 1. Create GitHub Repository
+- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
+- **Charts**: Highcharts.js
+- **PWA**: Service Worker API, Web App Manifest
+- **Storage**: Browser Local Storage
+- **Deployment**: GitHub Pages
+- **Mobile**: iOS Safari optimized
 
-1. Go to [GitHub.com](https://github.com) and create a new repository
-2. Name it `weight-tracker` or any name you prefer
-3. Make sure it's **public** (required for GitHub Pages)
-4. Don't initialize with README (we'll upload our files)
+## 📋 How to Use
 
-### 2. Upload Files
+1. **Add Entry**: Fill date/time and weight, click "Add Entry"
+2. **View Progress**: See your weight trend in the interactive chart
+3. **Manage Data**: Use "Edit" to modify entries, "Delete" to remove them
+4. **Export Data**: Copy to clipboard or download as JSON file
+5. **Import Data**: Paste JSON data to restore from backup
 
-Upload all files from this folder to your GitHub repository:
+## 🚀 Deployment to GitHub Pages
 
-- `index.html`
-- `style.css`
-- `script.js`
-- `manifest.json`
-- `sw.js`
-- `icons/` folder with all icon files
+### Option 1: Upload Files Manually
 
-### 3. Enable GitHub Pages
+1. Create a new **public** repository on GitHub
+2. Upload all project files to the repository
+3. Go to Settings → Pages
+4. Select "Deploy from a branch" → Branch: `main` → Save
+5. Your PWA will be live at `https://YOUR_USERNAME.github.io/REPO_NAME/`
+
+### Option 2: Clone & Push (Recommended)
+
+```bash
+# Clone this repository
+git clone https://github.com/MaciejPietrek/weight_tracker.git
+cd weight_tracker
+
+# Make your changes
+# ... edit files ...
+
+# Push to your repository
+git remote set-url origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
+git push -u origin main
+
+# Enable GitHub Pages in repository settings
+```
+
+## 🔧 Development
+
+### Prerequisites
+- Modern web browser with PWA support
+- Text editor or IDE
+- Local web server for development (optional)
+
+### Local Development
+```bash
+# Start local server
+python3 -m http.server 8000
+
+# Open http://localhost:8000 in your browser
+```
+
+### Building & Testing
+- Test on multiple devices and browsers
+- Verify PWA installation works
+- Test offline functionality
+- Check data export/import
+
+## 📱 Browser Support
+
+- ✅ **iOS Safari** (Optimized)
+- ✅ **Chrome Mobile**
+- ✅ **Firefox Mobile**
+- ✅ **Edge Mobile**
+- ✅ **Desktop browsers** with PWA support
+
+## 🐛 Troubleshooting
+
+### App not loading offline?
+- Ensure you visited the site at least once with internet
+- Service Worker needs to cache resources first
+
+### Icons not showing?
+- Clear browser cache and revisit
+- Check icon files are in correct `icons/` folder
+
+### Not installable on iOS?
+- Must be accessed via Safari (not Chrome)
+- Site must be served over HTTPS (GitHub Pages provides this)
+
+### Charts not displaying?
+- Check internet connection for initial Highcharts load
+- Verify JavaScript console for errors
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is open source. Feel free to modify and distribute.
+
+## 🙏 Acknowledgments
+
+- [Highcharts](https://www.highcharts.com/) for beautiful charting library
+- [PWA Community](https://web.dev/learn/pwa/) for PWA best practices
+- [Apple](https://developer.apple.com/documentation/webkit/delivering_web_content_to_safari) for iOS PWA documentation
+
+---
+
+**Made with ❤️ for health and fitness tracking**
 
 1. Go to your repository settings
 2. Scroll down to "Pages" section
