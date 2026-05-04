@@ -277,7 +277,7 @@ function updateChart() {
                 );
 
                 chart.reflow();
-              }, 150);
+              });
             };
 
             if (isMobile) {
