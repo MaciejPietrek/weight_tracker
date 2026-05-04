@@ -243,6 +243,9 @@ function updateChart() {
                     textKey: 'viewFullscreen',
                     onclick: function() {
                         // Custom fullscreen handling for mobile
+						/**
+						 * @type {HTMLDivElement}
+						 */
                         const chartContainer = this.container;
                         if (window.innerWidth <= 768) {
                             // On mobile, toggle maximized view instead of true fullscreen
@@ -251,21 +254,29 @@ function updateChart() {
                                 chartContainer.style.position = '';
                                 chartContainer.style.top = '';
                                 chartContainer.style.left = '';
-                                chartContainer.style.width = '';
-                                chartContainer.style.height = '';
+                                chartContainer.style.minWidth = '';
+                                chartContainer.style.minHeight = '';
                                 chartContainer.style.zIndex = '';
                                 chartContainer.style.background = '';
                                 document.body.style.overflow = '';
+								const svg = chartContainer.querySelector('svg')
+								svg.style.minWidth = 'unset';
+								svg.style.minHeight = 'unset';
+								console.log("removed", chartContainer)
                             } else {
                                 // Enter maximized view
                                 chartContainer.style.position = 'fixed';
                                 chartContainer.style.top = '0';
                                 chartContainer.style.left = '0';
-                                chartContainer.style.width = '100vw';
-                                chartContainer.style.height = '100vh';
+                                chartContainer.style.minWidth = '100vw';
+                                chartContainer.style.minHeight = '100vh';
                                 chartContainer.style.zIndex = '9999';
                                 chartContainer.style.background = 'white';
                                 document.body.style.overflow = 'hidden';
+								const svg = chartContainer.querySelector('svg')
+								svg.style.minWidth = '100%';
+								svg.style.minHeight = '100%';
+								console.log("added", chartContainer)
                             }
                             this.reflow();
                         } else {
