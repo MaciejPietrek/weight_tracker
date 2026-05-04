@@ -7,7 +7,51 @@ document.addEventListener('DOMContentLoaded', () => {
     loadData();
     updateChart();
     updateDataList();
+    preventZoom();
 });
+
+// Prevent zoom on mobile devices
+function preventZoom() {
+    // Prevent double-tap zoom
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', (event) => {
+        const now = Date.now();
+        if (now - lastTouchEnd <= 300) {
+            event.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
+
+    // Prevent pinch zoom
+    document.addEventListener('gesturestart', (e) => {
+        e.preventDefault();
+    });
+
+    // Prevent zoom on input focus (iOS)
+    document.addEventListener('focusin', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            // Small delay to ensure viewport is set
+            setTimeout(() => {
+                const viewport = document.querySelector('meta[name=viewport]');
+                if (viewport) {
+                    viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+                }
+            }, 100);
+        }
+    });
+
+    document.addEventListener('focusout', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            // Reset viewport after input blur
+            setTimeout(() => {
+                const viewport = document.querySelector('meta[name=viewport]');
+                if (viewport) {
+                    viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+                }
+            }, 100);
+        }
+    });
+}
 
 // Set current date and time as default
 function setDefaultDateTime() {
